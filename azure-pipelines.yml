@@ -6,14 +6,80 @@
 trigger:
 - main
 
-pool:
-  name: TestPool
+variables:
+- group: CxFlow
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+- stage: security
+  jobs:
+  - job: CxFlow
+    pool:
+      name: TestPool
+    steps:
+    - task: CmdLine@2
+      displayName: 'Retrieve CxFlow .jar file'
+      inputs:
+        script: |
+          wget -q https://github.com/checkmarx-ltd/cx-flow/releases/download/$(CX_FLOW_VERSION)/cx-flow-$(CX_FLOW_VERSION).jar
+    - task: CmdLine@2
+      displayName: 'Invoke CxFlow'
+      inputs:
+        script: |
+          java -Xms512m -Xmx2048m -Djava.security.egd=file:/dev/./urandom -jar cx-flow-$(CX_FLOW_VERSION).jar \
+          --scan \
+          --f=$(Build.Repository.LocalPath) \
+          --cx-project="$(Build.Repository.Name)" \
+          --namespace=$(basename $(System.CollectionUri)) \
+          --app="$(Build.Repository.Name)" \
+          --repo-name="$(Build.Repository.Name)" \
+          --branch=$(basename $(Build.SourceBranch)) \
+          --cx-flow.bug-tracker=$(CX_FLOW_BUG_TRACKER) \
+          --cx-flow.bug-tracker-impl=$(CX_FLOW_BUG_TRACKER) \
+          --cx-flow.filter-severity="$(CX_FILTER_SEVERITIES)" \
+          --cx-flow.enabled-vulnerability-scanners="sast" \
+          --checkmarx.base-url=$(CX_SERVER) \
+          --checkmarx.version=$(CX_VERSION) \
+          --checkmarx.client-id=$(CX_CLIENT_ID) \
+          --checkmarx.client-secret=$(CX_CLIENT_SECRET) \
+          --checkmarx.scope="$(CX_SCOPE)" \
+          --checkmarx.configuration="$(CX_CONFIGURATION)" \
+          --checkmarx.preset="$(CX_PRESET)" \
+          --checkmarx.team="$(CX_TEAM)" \
+          --checkmarx.username=$(CX_USERNAME) \
+          --checkmarx.password=$(CX_PASSWORD) \
+          --checkmarx.exclude-folders="$(CX_EXCLUDE_FOLDERS)" \
+          --checkmarx.exclude-files="$(CX_EXCLUDE_FILES)" \
+          --checkmarx.multi-tenant=$(CX_IS_MULTI_TENANT) \
+          --jira.url=$(CX_JIRA_URL) \
+          --jira.username=$(CX_JIRA_USERNAME) \
+          --jira.token=$(CX_JIRA_TOKEN) \
+          --jira.project=$(CX_JIRA_PROJECT) \
+          --jira.issue-type=$(CX_JIRA_ISSUE_TYPE) \
+          --jira.priorities.High=High \
+          --jira.priorities.Medium=Medium \
+          --jira.priorities.Low=Low \
+          --jira.priorities.Informational=Lowest \
+          --jira.open-transition="$(CX_JIRA_OPEN_TRANSITION)" \
+          --jira.close-transition="$(CX_JIRA_CLOSE_TRANSITION)" \
+          --jira.open-status="$(CX_JIRA_OPEN_STATUS)" \
+          --jira.closed-status="$(CX_JIRA_CLOSED_STATUS)" \
+          "--jira.fields[0].type=result" \
+          "--jira.fields[0].name=application" \
+          "--jira.fields[0].jira-field-name=Application" \
+          "--jira.fields[0].jira-field-type=label" \
+          "--jira.fields[1].type=result" \
+          "--jira.fields[1].name=category" \
+          "--jira.fields[1].jira-field-name=Category" \
+          "--jira.fields[1].jira-field-type=label" \
+          "--jira.fields[2].type=result" \
+          "--jira.fields[2].name=cwe" \
+          "--jira.fields[2].jira-field-name=CWE" \
+          "--jira.fields[2].jira-field-type=label" \
+          "--jira.fields[3].type=result" \
+          "--jira.fields[3].name=severity" \
+          "--jira.fields[3].jira-field-name=Severity" \
+          "--jira.fields[3].jira-field-type=label" \
+          "--jira.fields[4].type=result" \
+          "--jira.fields[4].name=loc" \
+          "--jira.fields[4].jira-field-name=Line Numbers" \
+          "--jira.fields[4].jira-field-type=label" \
