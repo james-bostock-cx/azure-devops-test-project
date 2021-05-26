@@ -26,6 +26,7 @@ stages:
       inputs:
         script: |
           java -Xms512m -Xmx2048m -Djava.security.egd=file:/dev/./urandom -jar cx-flow-$(CX_FLOW_VERSION).jar \
+          --logging.level.com.checkmarx=DEBUG \
           --scan \
           --f=$(Build.Repository.LocalPath) \
           --cx-project="$(Build.Repository.Name)" \
