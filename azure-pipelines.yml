@@ -22,6 +22,7 @@ stages:
         enableProxy: false
         enableSastScan: true
         CheckmarxService: 'CxSAST @ 172.35.1.146'
+        fullTeamName: 'CxServer'
         incScan: false
         enableDependencyScan: false
   - job: CxFlow
