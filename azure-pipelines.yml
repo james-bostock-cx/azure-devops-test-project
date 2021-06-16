@@ -12,7 +12,7 @@ variables:
 stages:
 - stage: security
   jobs:
-  - job: Checkmarx Plugin
+  - job: CheckmarxPlugin
     pool:
       name: TestPool
     steps:
