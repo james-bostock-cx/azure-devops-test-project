@@ -12,19 +12,6 @@ variables:
 stages:
 - stage: security
   jobs:
-  - job: CheckmarxPlugin
-    pool:
-      name: TestPool
-    steps:
-    - task: Application security testing@2021
-      inputs:
-        projectName: 'azure-devops-test-project'
-        enableProxy: false
-        enableSastScan: true
-        CheckmarxService: 'CxSAST @ 172.35.1.146'
-        fullTeamName: 'CxServer'
-        incScan: false
-        enableDependencyScan: false
   - job: CxFlow
     pool:
       name: TestPool
