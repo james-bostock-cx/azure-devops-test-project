@@ -14,7 +14,7 @@ stages:
   jobs:
   - job: CxFlow
     pool:
-      name: TestPool
+      name: Default
     steps:
     - task: CmdLine@2
       displayName: 'Retrieve CxFlow .jar file'
